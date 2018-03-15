@@ -1,0 +1,6 @@
+export const GARAGE_DOOR_UPDATE = 'GARAGE_DOOR_UPDATE';
+
+export const SET_PASSCODE = 'SET_PASSCODE';
+export const ALARM_UPDATE = 'ALARM_UPDATE';
+export const ALARM_CONNECTED = 'ALARM_CONNECTED';
+export const ALARM_ERROR = 'ALARM_ERROR';
