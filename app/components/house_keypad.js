@@ -10,6 +10,7 @@ var {
   TouchableHighlight,
   AlertIOS,
   AsyncStorage,
+  AppState,
 } = require('react-native');
 
 import * as alarmActions from '../actions/alarm';
@@ -22,20 +23,19 @@ import LastUpdate from './last_update';
 
 var SlideTo       = require('./slide_to'),
     QuickActions  = require('react-native-quick-actions'),
-    WatchManager  = require('../vendor/watch_manager.js'),
-    DateHelper    = require('../vendor/date_utils'),
-    TimerMixin    = require('react-timer-mixin'),
     subscriptions;
 
 class HouseKeypad extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = { appState: AppState.currentState };
+
     this.panic = this.panic.bind(this);
+    this.handleQuickAction = this.handleQuickAction.bind(this);
   }
   async componentDidMount() {
-    var self = this;
-    const { dispatch, AlarmAPI } = this.props;
+    const { dispatch } = this.props;
 
     if(!this.props.alarm.passcode) {
       const storageKey = this.props.alarm.passcodeStorageKey;
@@ -46,6 +46,8 @@ class HouseKeypad extends React.Component {
       } else {
         this.props.navigator.push({title: 'PasscodeKeypad', index: 1});
       }
+
+      AppState.addEventListener('change', this._handleAppStateChange);
     }
 
     this.eventSource = new RNEventSource(ServerURL + '/stream');
@@ -66,21 +68,40 @@ class HouseKeypad extends React.Component {
         dispatch(alarmActions.connected());
       }),
       DeviceEventEmitter.addListener(
-        'quickActionShortcut', self.handleQuickAction)
+        'quickActionShortcut', this.handleQuickAction)
     ];
 
-    this.handleQuickAction(QuickActions.popInitialAction());
+    QuickActions.popInitialAction().then(this.handleQuickAction);
 
-    let response = await AlarmAPI.status();
-    let data     = await response.json();
+    this._refreshStatus();
+  }
+
+  componentWillUnmount() {
+    subscriptions.map((s) => { s.remove(); });
+
+    AppState.removeEventListener('change', this._handleAppStateChange);
+
+    this.eventSource.close();
+  }
+
+  _refreshStatus = async () => {
+    const { dispatch, AlarmAPI } = this.props;
+
+    const response = await AlarmAPI.status();
+    const data     = await response.json();
 
     dispatch(alarmActions.update(data.alarm));
     dispatch(garageDoorActions.update(data.garage_door));
   }
-  componentDidUmnount() {
-    subscriptions.map((s) => { s.remove(); });
-    this.eventSource.close();
+
+  _handleAppStateChange = (nextAppState) => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      this._refreshStatus();
+    }
+
+    this.setState({ appState: nextAppState });
   }
+
   handleQuickAction(data) {
     if(data == null) return false;
 
@@ -266,7 +287,7 @@ var styles = StyleSheet.create({
   },
   panic: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 50,
     left: 10,
     right: 10,
   },
@@ -286,7 +307,7 @@ var styles = StyleSheet.create({
   },
   lastUpdatedContainer: {
     position: 'absolute',
-    bottom: 10,
+    bottom: 20,
     left: 10,
     right: 10,
     alignItems: 'center',

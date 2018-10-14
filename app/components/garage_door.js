@@ -33,7 +33,7 @@ export const GarageSvg = ({status, width, height}) => {
   } else if (status == null || status != 'open') {
     fillColor = '#aaaaaa';
 
-    door = (<Text x="51" y="50" stroke={fillColor} fontWeight="200"
+    door = (<Text x="51" y="100" stroke={fillColor} fontWeight="200"
             width="200"
             textAnchor="middle">{status}</Text>)
   }
