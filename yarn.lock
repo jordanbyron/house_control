@@ -5200,9 +5200,9 @@ react-native-event-source@^1.0.1:
   integrity sha512-pDbGSjy2nWaX7ZEDWSL1krcGLm5ctyjlwYmQi7q/8bGtRXio7YJi5OKZjr3T33MAmD3PV/Bs4NH/f7uvojndZw==
 
 react-native-quick-actions@^0.3.6:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/react-native-quick-actions/-/react-native-quick-actions-0.3.6.tgz#e647fd04825cdf04ad40d15e8ae358118d752487"
-  integrity sha1-5kf9BIJc3wStQNFeiuNYEY11JIc=
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/react-native-quick-actions/-/react-native-quick-actions-0.3.7.tgz#5f4eff25e7f3785b2364f72527591ac7b777b1ef"
+  integrity sha512-UXXjnW1exB8eECcDVy35tKCUqOWHbIwE5gT3KLJS5a/Sb/LseuVjCNhAv0HN+XL0Bx3NYoc+ORSm1NDKJabDNA==
 
 react-native-svg@^6.2.2:
   version "6.2.2"
