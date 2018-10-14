@@ -50,25 +50,9 @@ class HouseKeypad extends React.Component {
       AppState.addEventListener('change', this._handleAppStateChange);
     }
 
-    this.eventSource = new RNEventSource(ServerURL + '/stream');
-
     subscriptions = [
-      this.eventSource.addEventListener('status', function(message) {
-        var status = JSON.parse(message.data);
-
-        dispatch(alarmActions.update(status));
-      }),
-      this.eventSource.addEventListener('garage_door', function(message) {
-        dispatch(garageDoorActions.update(message.data));
-      }),
-      this.eventSource.addEventListener('error', function(data) {
-        dispatch(alarmActions.error(data.message));
-      }),
-      this.eventSource.addEventListener('open', function(message) {
-        dispatch(alarmActions.connected());
-      }),
-      DeviceEventEmitter.addListener(
-        'quickActionShortcut', this.handleQuickAction)
+      ...this._initEventSource(),
+      DeviceEventEmitter.addListener('quickActionShortcut', this.handleQuickAction)
     ];
 
     QuickActions.popInitialAction().then(this.handleQuickAction);
@@ -97,9 +81,37 @@ class HouseKeypad extends React.Component {
   _handleAppStateChange = (nextAppState) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       this._refreshStatus();
+      // TODO capture event subscriptions
+      this._initEventSource();
+    } else if (this.state.appState === 'active' && nextAppState.match(/inactive|background/)) {
+      // TODO remove event subscriptions
+      this.eventSource.close();
     }
 
     this.setState({ appState: nextAppState });
+  }
+
+  _initEventSource = () => {
+    const { dispatch } = this.props;
+
+    this.eventSource = new RNEventSource(`${ServerURL}/stream`);
+
+    return [
+      this.eventSource.addEventListener('status', function(message) {
+        const status = JSON.parse(message.data);
+
+        dispatch(alarmActions.update(status));
+      }),
+      this.eventSource.addEventListener('garage_door', function(message) {
+        dispatch(garageDoorActions.update(message.data));
+      }),
+      this.eventSource.addEventListener('error', function(data) {
+        dispatch(alarmActions.error(data.message));
+      }),
+      this.eventSource.addEventListener('open', function(message) {
+        dispatch(alarmActions.connected());
+      })
+    ];
   }
 
   handleQuickAction(data) {
