@@ -159,26 +159,33 @@ class HouseKeypad extends React.Component {
 
     return (
       <View style={styles.container}>
-        <WatchConnectivity AlarmAPI={AlarmAPI} GarageDoorAPI={GarageDoorAPI}
-          alarmStatus={this.alarmDisplay()} garageDoorStatus={this.props.garageDoor.status}
-          error={this.props.alarm.error} />
         {alarmDisplay}
-        <View style={styles.alarmControlsContainer}>
-          <TouchableHighlight onPress={() => AlarmAPI.off()}
-          underlayColor={'#3071A9'} style={styles.button}>
-            <Text style={styles.alarmOff}>Off</Text>
-          </TouchableHighlight>
-          <TouchableHighlight onPress={() => AlarmAPI.away()}
-            underlayColor={'#843534'} style={styles.button}>
-            <Text style={styles.alarmDanger}>Away</Text>
-          </TouchableHighlight>
-          <TouchableHighlight onPress={() => AlarmAPI.stay()}
-            underlayColor={'#843534'} style={styles.button}>
-            <Text style={styles.alarmDanger}>Stay</Text>
-          </TouchableHighlight>
+        <View style={{
+          flex: 1,
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'stretch',
+          paddingBottom: 125
+        }}>
+          <View style={styles.alarmControlsContainer}>
+            <TouchableHighlight onPress={() => AlarmAPI.off()}
+            underlayColor={'#3071A9'} style={styles.button}>
+              <Text style={styles.alarmOff}>Off</Text>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => AlarmAPI.away()}
+              underlayColor={'#843534'} style={styles.button}>
+              <Text style={styles.alarmDanger}>Away</Text>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => AlarmAPI.stay()}
+              underlayColor={'#843534'} style={styles.button}>
+              <Text style={styles.alarmDanger}>Stay</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.alarmControlsContainer}>
+            <GarageDoor status={this.props.garageDoor.status}
+              onPress={() => this.props.GarageDoorAPI.toggle()} />
+          </View>
         </View>
-        <GarageDoor status={this.props.garageDoor.status}
-          onPress={() => this.props.GarageDoorAPI.toggle()} />
         <View style={styles.panic}>
           <SlideTo message={'slide to panic'} callback={this.panic} />
         </View>
@@ -194,6 +201,7 @@ class HouseKeypad extends React.Component {
         style = {
           borderRadius: 4,
           backgroundColor: '#eee',
+          marginTop: 25,
           padding: 15,
           alignItems: 'center',
           width: this.props.deviceWidth - 20,
@@ -279,19 +287,20 @@ var styles = StyleSheet.create({
   alarmControlsContainer: {
     flexDirection: 'row',
     alignItems: 'stretch',
+    justifyContent: 'center',
     marginTop: 10,
     marginBottom: 40,
   },
   alarmOff: {
     color: '#428BCA',
     padding: 20,
-    fontSize: 28,
+    fontSize: 31,
     textAlign: 'center',
   },
   alarmDanger: {
     color: '#A94442',
     padding: 20,
-    fontSize: 28,
+    fontSize: 32,
     textAlign: 'center',
   },
   button: {
@@ -319,7 +328,7 @@ var styles = StyleSheet.create({
   },
   lastUpdatedContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 25,
     left: 10,
     right: 10,
     alignItems: 'center',
